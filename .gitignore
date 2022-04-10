@@ -1,3 +1,5 @@
 venv/
 .idea/
 movies/
+*.csv
+client_secrets.json
