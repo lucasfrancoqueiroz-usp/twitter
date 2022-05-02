@@ -3,3 +3,4 @@ venv/
 movies/
 *.csv
 client_secrets.json
+gd_tweets_folder.py
