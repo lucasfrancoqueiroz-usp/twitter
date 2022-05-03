@@ -31,15 +31,36 @@ class Extract():
         return end
 
 
+    def _get_scrapped_movies():
+        lines = []
+        if os.path.exists(scrapped_movies_file):
+            with open(scrapped_movies_file) as file:
+                lines = file.readlines()
+                lines = [line.rstrip() for line in lines]
+        return lines
+
+
+    def save_movie_as_scrapped(release_id):
+        f = open(scrapped_movies_file, 'a')
+        f.write(f"{release_id}\n")
+        f.close()
+
+
     def get_movies():
-        df = pd.read_csv("movies_search_dory.csv")
-        info = df.apply(lambda row: (
+        scrapped_movies = Extract._get_scrapped_movies()
+        df_total = pd.read_csv("movies_search_dory.csv")
+        df = df_total[~df_total['release_id'].isin(scrapped_movies)]
+
+        movies = df.apply(lambda row: (
             row['release_id'],
             row['release'],
             row['search'],
             datetime.datetime.strptime(row['release_start'], "%Y-%m-%d")
         ), axis=1).values
-        return info
+
+        total = len(df_total)
+        start = total - len(movies) + 1
+        return movies, start, total
 
 
     def get_expected_requests(search, release_id, days):
@@ -84,15 +105,16 @@ DAYS_AFTER_RELEASE = 14
 days_before_release = datetime.timedelta(DAYS_BEFORE_RELEASE)
 days_after_release = datetime.timedelta(DAYS_AFTER_RELEASE)
 max_results = -1
+scrapped_movies_file = "scrapped_movies.txt"
 
 if __name__ == "__main__":
 
     logging.basicConfig(filename=f"{movies_folder}/log.txt", encoding='utf-8', level=logging.DEBUG, format='%(message)s')
-    movies = Extract.get_movies()
-    c = 1
+    movies, c, t = Extract.get_movies()
     for release_id, movie, search, release_date in movies:
+
         began_at = datetime.datetime.now()
-        Utils.log(f"{Utils.now()} | {c} of {len(movies)}")
+        Utils.log(f"{Utils.now()} | {c} of {t}")
         Utils.log(f"{Utils.now()} | ID: {release_id} - MOVIE: {movie} - START")
 
         # Days range
@@ -124,6 +146,9 @@ if __name__ == "__main__":
         Utils.log(f"{Utils.now()} | ID: {release_id} - MOVIE: {movie} - REMOVING START")
         Utils.remove_files(f"{movies_folder}/*.jl")
         Utils.log(f"{Utils.now()} | ID: {release_id} - MOVIE: {movie} - REMOVING END")
+
+        # Flag movie as scrapped
+        Extract.save_movie_as_scrapped(release_id)
 
         finished_at = datetime.datetime.now()
         delta = finished_at - began_at

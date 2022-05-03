@@ -4,3 +4,4 @@ movies/
 *.csv
 client_secrets.json
 gd_tweets_folder.py
+scrapped_movies.txt
