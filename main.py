@@ -48,7 +48,7 @@ class Extract():
 
     def get_movies():
         scrapped_movies = Extract._get_scrapped_movies()
-        df_total = pd.read_csv("movies_search_dory.csv")
+        df_total = pd.read_csv("movies_search.csv")
         df = df_total[~df_total['release_id'].isin(scrapped_movies)]
 
         movies = df.apply(lambda row: (
