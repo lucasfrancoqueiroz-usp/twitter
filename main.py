@@ -110,11 +110,11 @@ scrapped_movies_file = "scrapped_movies.txt"
 if __name__ == "__main__":
 
     logging.basicConfig(filename=f"{movies_folder}/log.txt", encoding='utf-8', level=logging.DEBUG, format='%(message)s')
-    movies, c, t = Extract.get_movies()
+    movies, c, tc = Extract.get_movies()
     for release_id, movie, search, release_date in movies:
 
         began_at = datetime.datetime.now()
-        Utils.log(f"{Utils.now()} | {c} of {t}")
+        Utils.log(f"{Utils.now()} | {c} of {tc}")
         Utils.log(f"{Utils.now()} | ID: {release_id} - MOVIE: {movie} - START")
 
         # Days range

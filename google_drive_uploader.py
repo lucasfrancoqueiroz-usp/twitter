@@ -48,6 +48,16 @@ class GoogleDriveUploader:
         tweet_files = glob.glob(movie_folder)
         for tweet_file in tweet_files:
             filename = os.path.basename(tweet_file)
+            GoogleDriveUploader._delete_file(filename)
             Utils.log(f"{Utils.now()} | FILENAME: {filename} - UPLOADING START")
             gd_movie_file = GoogleDriveUploader._upload_gd_movie_file(filename, tweet_file, tweets_folder_id)
             Utils.log(f"{Utils.now()} | FILENAME: {filename} - UPLOADING END")
+
+
+    def _delete_file(filename):
+        file_list = drive.ListFile({'q': f"title = '{filename}' and trashed=False"}).GetList()
+        try:
+            for file in file_list:
+                file.Delete()
+        except:
+            pass
